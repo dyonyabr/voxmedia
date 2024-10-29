@@ -1,6 +1,6 @@
 Button = {}
 
-function Button:new(text, click_func, x, y, w, h, ox, oy)
+function Button:new(text, click_func, x, y, w, h, r, ox, oy, draw_shadow)
     local obj = {}
 
     obj.text = text
@@ -12,9 +12,11 @@ function Button:new(text, click_func, x, y, w, h, ox, oy)
         x = x + offset.x,
         y = y + offset.y,
         w = w,
-        h = h
+        h = h,
+        r = r
     }
     obj.hovered = false
+    obj.draw_shadow = draw_shadow
 
     function obj:load()
     end
@@ -48,10 +50,17 @@ function Button:new(text, click_func, x, y, w, h, ox, oy)
     end
 
     function obj:draw()
-        love.graphics.setScissor(obj.coords.x + offset.x, obj.coords.y + offset.y, obj.coords.w, obj.coords.h)
+        if draw_shadow then
+            box_shadow(obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h, 20, { 0, 0, 0, .15 })
+        end
+
+        love.graphics.stencil(function()
+            love.graphics.rectangle("fill", obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h, obj.coords.r)
+        end, "replace", 1)
+        love.graphics.setStencilTest("greater", 0)
 
         love.graphics.setColor(obj.color.r, obj.color.g, obj.color.b, obj.color.a)
-        love.graphics.rectangle("fill", obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h)
+        love.graphics.rectangle("fill", obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h, obj.coords.r)
 
         obj.click_effect:draw()
 
@@ -60,7 +69,7 @@ function Button:new(text, click_func, x, y, w, h, ox, oy)
             obj.coords.w - 10,
             "center")
 
-        love.graphics.setScissor()
+        love.graphics.setStencilTest()
     end
 
     setmetatable(obj, self)

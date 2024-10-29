@@ -58,12 +58,14 @@ function WindowTopBar:new()
         end
 
         if is_mouse_hover(obj.close.coords.x, obj.close.coords.y, obj.close.coords.w, obj.close.coords.h, obj.offset.x, obj.offset.y) then
+            set_cursor("hand")
             obj.close.hovered = true
         else
             obj.close.hovered = false
         end
 
         if is_mouse_hover(obj.minimize.coords.x, obj.minimize.coords.y, obj.minimize.coords.w, obj.minimize.coords.h, obj.offset.x, obj.offset.y) then
+            set_cursor("hand")
             obj.minimize.hovered = true
         else
             obj.minimize.hovered = false

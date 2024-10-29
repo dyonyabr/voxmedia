@@ -29,29 +29,39 @@ function clamp(val, lower, upper)
     return math.max(lower, math.min(upper, val))
 end
 
-function is_hover(x, y, w, h, px, py)
-    return not (px < x or py < y or px > x + w or py > y + h)
+cur_hover = { 0, 0, 0, 0 }
+
+function is_hover(x, y, w, h, px, py, ox, oy)
+    x = x + ox
+    y = y + oy
+    local da = not (px < x or py < y or px > x + w or py > y + h)
+    local new = (cur_hover[1] == 0 and cur_hover[2] == 0 and cur_hover[3] == 0 and cur_hover[4] == 0)
+    local inside = not new and ((cur_hover[1] == x and cur_hover[2] == y and cur_hover[3] == w and cur_hover[4] == h) or
+        (cur_hover[1] <= x and cur_hover[2] <= y and cur_hover[3] >= w and cur_hover[4] >= h))
+    if (new or inside) and da then
+        cur_hover = { x, y, w, h }
+        return true
+    end
+    return false
 end
 
 function is_mouse_hover(x, y, w, h, ox, oy)
-    if ox == nil then ox = offset.x end
-    if oy == nil then oy = offset.y end
+    if ox == nil then ox = 0 end
+    if oy == nil then oy = 0 end
     local px, py = love.mouse.getPosition()
-    px = px - ox
-    py = py - oy
-    return is_hover(x, y, w, h, px, py)
+    return is_hover(x, y, w, h, px, py, ox, oy)
 end
 
-function is_hover_circle(x, y, radius, px, py)
+function is_hover_circle(x, y, radius, px, py, ox, oy)
+    x = x + ox
+    y = y + oy
     local distance = math.sqrt((px - x) ^ 2 + (py - y) ^ 2)
     return distance <= radius
 end
 
 function is_mouse_hover_circle(x, y, radius, ox, oy)
     local px, py = love.mouse.getPosition()
-    px = px - ox
-    py = py - oy
-    return is_hover_circle(x, y, radius, px, py)
+    return is_hover_circle(x, y, radius, px, py, ox, oy)
 end
 
 function drawLTWH(image, x, y, width, height, aspect)
@@ -114,4 +124,8 @@ end
 
 function set_cursor(type)
     love.mouse.setCursor(love.mouse.getSystemCursor(type))
+end
+
+function tools_update(dt)
+    cur_hover = { 0, 0, 0, 0 }
 end

@@ -16,7 +16,7 @@ function SideBar:new(main_page)
     obj.coords = {
         x = 0,
         y = 0,
-        w = 40,
+        w = obj.min_width,
         h = love.graphics.getHeight()
     }
     obj.hovered = false

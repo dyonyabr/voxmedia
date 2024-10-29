@@ -16,7 +16,7 @@ function SideBarOption:new(side_bar, i, icon_path, label, page)
     obj.coords = {
         x = obj.side_bar.coords.x,
         y = obj.side_bar.coords.y,
-        w = 200,
+        w = obj.side_bar.max_width,
         h = 40
     }
     obj.hovered = false
@@ -36,7 +36,7 @@ function SideBarOption:new(side_bar, i, icon_path, label, page)
     end
 
     function obj:update(dt)
-        if is_mouse_hover(obj.coords.x, obj.coords.y + obj.coords.h * obj.i, side_bar.coords.w, obj.coords.h, obj.side_bar.offset.x, obj.side_bar.offset.y) then
+        if is_mouse_hover(obj.coords.x + 1, obj.coords.y + obj.coords.h * obj.i + 1, side_bar.coords.w - 2, obj.coords.h - 2, obj.side_bar.offset.x, obj.side_bar.offset.y) then
             obj.hovered = true
             set_cursor("hand")
         else

@@ -30,6 +30,7 @@ function love.update(dt)
 
     window_top_bar:update(dt)
     main_page:update(dt)
+    tools_update(dt)
 end
 
 function love.mousepressed(x, y, button)
