@@ -1,26 +1,52 @@
+require "pages.myProfile"
+require "pages.saved"
+require "pages.dashboard"
 require "components.sideBar"
+require "stuff.clickEffect"
+require "stuff.button"
 
 MainPage = {}
 
 function MainPage:new()
     local obj = {}
 
-    obj.side_bar = SideBar:new()
+    obj.my_profile = MyProfile:new()
+    obj.saved = Saved:new()
+    obj.dashboard = Dashboard:new()
+
+    obj.page = obj.my_profile
+
+    obj.side_bar = SideBar:new(obj)
+
+    function obj:setPage(page)
+        obj.page = page
+    end
 
     function obj:load()
         obj.side_bar:load()
-    end
-
-    function obj:mousepressed(x, y, button)
-        obj.side_bar:mousepressed(x, y, button)
+        if obj.page ~= nil then
+            obj.page:load()
+        end
     end
 
     function obj:update(dt)
         obj.side_bar:update(dt)
+        if obj.page ~= nil then
+            obj.page:update(dt)
+        end
+    end
+
+    function obj:mousepressed(x, y, button)
+        obj.side_bar:mousepressed(x, y, button)
+        if obj.page ~= nil then
+            obj.page:mousepressed(x, y, button)
+        end
     end
 
     function obj:draw()
-        love.graphics.setBackgroundColor(colors.dark.r, colors.dark.g, colors.dark.b, colors.dark.a)
+        if obj.page ~= nil then
+            obj.page:draw()
+        end
         obj.side_bar:draw()
     end
 

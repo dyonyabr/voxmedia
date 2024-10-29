@@ -1,0 +1,23 @@
+Dashboard = {}
+
+function Dashboard:new()
+    local obj = {}
+
+    function obj:load()
+    end
+
+    function obj:mousepressed(x, y, button)
+    end
+
+    function obj:update(dt)
+    end
+
+    function obj:draw()
+        love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
+        love.graphics.printf("Dashboard Page", WorkSans, 40, 300, love.graphics.getWidth(), "center")
+    end
+
+    setmetatable(obj, self)
+    self.__index = self
+    return obj
+end
