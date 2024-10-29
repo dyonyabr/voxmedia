@@ -47,9 +47,11 @@ function is_hover_circle(x, y, radius, px, py)
     return distance <= radius
 end
 
-function is_mouse_hover_circle(x, y, radius)
+function is_mouse_hover_circle(x, y, radius, ox, oy)
     local px, py = love.mouse.getPosition()
-    is_hover_circle(x, y, radius, px, py)
+    px = px - ox
+    py = py - oy
+    return is_hover_circle(x, y, radius, px, py)
 end
 
 function drawLTWH(image, x, y, width, height, aspect)

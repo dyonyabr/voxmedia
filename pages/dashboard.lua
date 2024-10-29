@@ -14,7 +14,7 @@ function Dashboard:new()
 
     function obj:draw()
         love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
-        love.graphics.printf("Dashboard Page", WorkSans, 40, 300, love.graphics.getWidth(), "center")
+        love.graphics.printf("Dashboard Page", WorkSans, 40, 300, love.graphics.getWidth() - 40, "center")
     end
 
     setmetatable(obj, self)

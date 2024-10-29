@@ -12,7 +12,10 @@ function MyProfile:new()
         image = love.graphics.newImage("assets/images/test_avatar.png"),
         x = love.graphics.getWidth() - obj.offset.x - 100,
         y = 100,
-        radius = 60
+        radius = 60,
+        hovered = false,
+        edit_y = 0,
+        edit_icon = love.graphics.newImage("assets/icons/icon_photo.png")
     }
 
     obj.cap = {
@@ -20,7 +23,7 @@ function MyProfile:new()
         x = 0,
         y = 0,
         w = love.graphics.getWidth() - obj.offset.x,
-        h = obj.avatar.y
+        h = obj.avatar.y,
     }
     obj.cap.quad = love.graphics.newQuad(0, 0, obj.cap.w, obj.cap.h, obj.cap.image:getWidth(), obj.cap.image:getHeight())
 
@@ -34,6 +37,17 @@ function MyProfile:new()
 
     function obj:update(dt)
         obj.button:update(dt)
+
+        if is_mouse_hover_circle(obj.avatar.x, obj.avatar.y, obj.avatar.radius, obj.offset.x, obj.offset.y) then
+            set_cursor("hand")
+            obj.avatar.hovered = true
+        else
+            obj.avatar.hovered = false
+        end
+
+        local avatar_edit_y = 0
+        if obj.avatar.hovered then avatar_edit_y = 40 end
+        obj.avatar.edit_y = lerp(obj.avatar.edit_y, avatar_edit_y, dt * 20)
     end
 
     function obj:draw()
@@ -56,6 +70,13 @@ function MyProfile:new()
         drawLTWH(obj.avatar.image, obj.avatar.x - obj.avatar.radius, obj.avatar.y - obj.avatar.radius,
             obj.avatar.radius * 2,
             obj.avatar.radius * 2)
+
+        love.graphics.setColor(colors.main.r, colors.main.g, colors.main.b, 1)
+        love.graphics.rectangle("fill", obj.avatar.x - obj.avatar.radius,
+            obj.avatar.y + obj.avatar.radius - obj.avatar.edit_y, obj.avatar.radius * 2, obj.avatar.radius * 2)
+        love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
+        drawLTWH(obj.avatar.edit_icon, obj.avatar.x - obj.avatar.radius + 10,
+            obj.avatar.y + obj.avatar.radius - obj.avatar.edit_y + 10, obj.avatar.radius * 2 - 20, 40 - 20, "horizontal")
         love.graphics.setStencilTest()
 
         love.graphics.setColor(colors.secondary_text.r, colors.secondary_text.g, colors.secondary_text.b, 1)

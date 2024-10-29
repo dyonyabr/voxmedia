@@ -69,7 +69,7 @@ function SideBarOption:new(side_bar, i, icon_path, label, page)
 
     function obj:draw()
         love.graphics.setScissor(obj.coords.x + obj.side_bar.offset.x,
-            obj.coords.y + obj.coords.h * obj.i + obj.side_bar.offset.y, obj.side_bar.coords.w + 1,
+            obj.coords.y + obj.coords.h * obj.i + obj.side_bar.offset.y, obj.side_bar.coords.w,
             obj.coords.h)
         love.graphics.setColor(obj.color.r, obj.color.g, obj.color.b, obj.color.a)
         love.graphics.rectangle("fill", obj.coords.x, obj.coords.y + obj.coords.h * obj.i, obj.coords.w, obj.coords.h)
