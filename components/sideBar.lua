@@ -22,9 +22,9 @@ function SideBar:new(main_page)
     obj.hovered = false
 
     obj.options = {
-        SideBarOption:new(obj, 0, "assets/icons/icon_user.png", "My Profile", obj.main_page.my_profile),
-        SideBarOption:new(obj, 1, "assets/icons/icon_saved.png", "Saved", obj.main_page.saved),
-        SideBarOption:new(obj, 2, "assets/icons/icon_cube.png", "Dashboard", obj.main_page.dashboard),
+        SideBarOption:new(obj, 0, icons.user, "My Profile", obj.main_page.my_profile),
+        SideBarOption:new(obj, 1, icons.saved, "Saved", obj.main_page.saved),
+        SideBarOption:new(obj, 2, icons.cube, "Dashboard", obj.main_page.dashboard),
     }
 
     function obj:load()
@@ -51,8 +51,8 @@ function SideBar:new(main_page)
         if (obj.hovered) then
             w = obj.max_width; tone = 1
         end
-        obj.coords.w = lerp(obj.coords.w, w, dt * 20)
-        obj.tone = lerp(obj.tone, tone, dt * 20)
+        obj.coords.w = lerp(obj.coords.w, w, dt * 10)
+        obj.tone = lerp(obj.tone, tone, dt * 10)
 
         for i = 1, #obj.options do
             obj.options[i]:update(dt)
@@ -62,6 +62,8 @@ function SideBar:new(main_page)
     function obj:draw()
         love.graphics.origin()
         set_offset(obj.offset.x, obj.offset.y)
+
+        box_shadow(obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h, 40, { 0, 0, 0, .2 })
 
         love.graphics.setColor(0, 0, 0, obj.tone * .5)
         love.graphics.rectangle("fill", obj.coords.x, obj.coords.y, love.graphics.getWidth() - obj.offset.x,

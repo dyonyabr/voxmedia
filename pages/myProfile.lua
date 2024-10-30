@@ -1,3 +1,4 @@
+require "components.pagePost"
 MyProfile = {}
 
 function MyProfile:new()
@@ -5,48 +6,84 @@ function MyProfile:new()
 
     obj.offset = { x = 40, y = 30 }
 
-    obj.button = Button:new("Button", function() print("button_pressed") end, 100, 200, 100, 30, 10, obj.offset.x,
-        obj.offset.y, true)
-
     obj.avatar = {
-        image = love.graphics.newImage("assets/images/test_avatar.png"),
+        image = images.test_avatar,
         x = love.graphics.getWidth() - obj.offset.x - 100,
         y = 100,
         radius = 60,
         hovered = false,
         edit_y = 0,
-        edit_icon = love.graphics.newImage("assets/icons/icon_photo.png")
+        edit_icon = icons.photo
     }
 
     obj.cap = {
-        image = love.graphics.newImage("assets/images/test_cap.png"),
+        image = images.test_cap,
         x = 0,
         y = 0,
         w = love.graphics.getWidth() - obj.offset.x,
         h = obj.avatar.y,
         hovered = false,
         edit_a = 0,
-        edit_icon = love.graphics.newImage("assets/icons/icon_edit.png")
+        edit_icon = icons.edit
     }
     obj.cap.quad = love.graphics.newQuad(0, 0, obj.cap.w, obj.cap.h, obj.cap.image:getWidth(), obj.cap.image:getHeight())
 
+    obj.post_offset = {
+        x = (love.graphics.getWidth() - obj.offset.x) / 2 - 330,
+        y = obj.avatar.y + obj.avatar.radius +
+            40
+    }
+
+    obj.posts = {}
+    for i = 0, 99 do
+        obj.posts[i + 1] = PagePost:new(obj, i, obj.post_offset.x, obj.post_offset.y,
+            obj.offset.x,
+            obj.offset.y)
+    end
+
+    obj.cur_post = 0
+    function obj:set_cur_post(value) obj.cur_post = clamp(value, 0, #obj.posts - 1) end
+
+    obj.post_trans = 0
+
+    obj.post_count = {
+        x = (love.graphics.getWidth() - obj.offset.x) / 2 - 50,
+        y = love.graphics.getHeight() - 75,
+        w = 100
+    }
+
+    obj.post_left = IconButton:new(icons.arrow_left, function() obj:set_cur_post(obj.cur_post - 1) end,
+        obj.post_count.x - 20, love.graphics.getHeight() - 65, 20, 10, obj.offset.x,
+        obj.offset.y)
+
+    obj.post_right = IconButton:new(icons.arrow_right,
+        function() obj:set_cur_post(obj.cur_post + 1) end,
+        obj.post_count.x + obj.post_count.w + 20, love.graphics.getHeight() - 65, 20, 10, obj.offset.x,
+        obj.offset.y)
+
     function obj:load()
-        obj.button:load()
+        for i = 1, #obj.posts do
+            obj.posts[i]:load()
+        end
+        obj.post_left:load()
+        obj.post_right:load()
     end
 
     function obj:mousepressed(x, y, button)
-        obj.button:mousepressed(x, y, button)
+        obj.posts[obj.cur_post + 1]:mousepressed(x, y, button)
+        obj.post_left:mousepressed(x, y, button)
+        obj.post_right:mousepressed(x, y, button)
     end
 
     function obj:update(dt)
-        obj.button:update(dt)
-
         if is_mouse_hover_circle(obj.avatar.x, obj.avatar.y, obj.avatar.radius, obj.offset.x, obj.offset.y) then
             set_cursor("hand")
             obj.avatar.hovered = true
         else
             obj.avatar.hovered = false
         end
+
+        obj.post_trans = lerp(obj.post_trans, -700 * obj.cur_post, dt * 10)
 
         local cap_edit_y = 0
         if obj.avatar.hovered then cap_edit_y = 40 end
@@ -62,6 +99,11 @@ function MyProfile:new()
         local cap_edit_a = 0
         if obj.cap.hovered then cap_edit_a = 1 end
         obj.cap.edit_a = lerp(obj.cap.edit_a, cap_edit_a, dt * 20)
+
+        obj.posts[obj.cur_post + 1]:update(dt)
+
+        obj.post_left:update(dt)
+        obj.post_right:update(dt)
     end
 
     function obj:draw()
@@ -72,9 +114,9 @@ function MyProfile:new()
 
         love.graphics.draw(obj.cap.image, obj.cap.quad, obj.cap.x, obj.cap.y)
         love.graphics.setColor(colors.button.r, colors.button.g, colors.button.b, obj.cap.edit_a)
-        love.graphics.rectangle("fill", love.graphics.getWidth() - obj.offset.x - 50, 10, 40, 40, 7)
+        love.graphics.rectangle("fill", love.graphics.getWidth() - obj.offset.x - 40, 10, 30, 30, 7)
         love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, obj.cap.edit_a)
-        drawLTWH(obj.cap.edit_icon, love.graphics.getWidth() - obj.offset.x - 40, 20, 20, 20)
+        drawLTWH(obj.cap.edit_icon, love.graphics.getWidth() - obj.offset.x - 35, 15, 20, 20)
 
         love.graphics.setScissor(obj.cap.x + obj.offset.x, obj.cap.y + obj.offset.y, obj.cap.w, obj.cap.h)
         circle_shadow(obj.avatar.x, obj.avatar.y, obj.avatar.radius, 20, { 0, 0, 0, .5 })
@@ -98,14 +140,34 @@ function MyProfile:new()
         love.graphics.setStencilTest()
 
         love.graphics.setColor(colors.secondary_text.r, colors.secondary_text.g, colors.secondary_text.b, 1)
-        love.graphics.printf("228 Posts", WorkSans, obj.cap.x, obj.avatar.y + 40,
-            obj.avatar.x - obj.avatar.radius, "right")
+        love.graphics.printf(#obj.posts .. " Posts", fonts.WorkSans, obj.cap.x, obj.avatar.y + 40,
+            obj.avatar.x - obj.avatar.radius - 20, "right")
 
         love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
-        love.graphics.printf("AntonGondon", WorkSansBig, obj.cap.x, obj.avatar.y + 10,
+        love.graphics.printf("AntonGondon", fonts.WorkSansBig, obj.cap.x, obj.avatar.y + 10,
             obj.avatar.x - obj.avatar.radius - 15, "right")
 
-        obj.button:draw()
+        love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
+        love.graphics.printf("Posts", fonts.WorkSansBig, obj.post_offset.x, obj.post_offset.y - 50,
+            love.graphics.getWidth(), "left")
+
+        love.graphics.push()
+
+        set_offset(obj.post_trans, 0)
+        -- love.graphics.translate(obj.post_trans, 0)
+
+        if obj.cur_post ~= 0 then obj.posts[obj.cur_post]:draw() end
+        obj.posts[obj.cur_post + 1]:draw()
+        if obj.cur_post ~= #obj.posts - 1 then obj.posts[obj.cur_post + 2]:draw() end
+
+        love.graphics.pop()
+
+        obj.post_left:draw()
+        obj.post_right:draw()
+
+        love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
+        love.graphics.printf((obj.cur_post + 1) .. " / " .. #obj.posts, obj.post_count.x, obj.post_count.y,
+            obj.post_count.w, "center")
     end
 
     setmetatable(obj, self)

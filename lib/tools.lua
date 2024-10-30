@@ -1,20 +1,3 @@
-colors = {
-    main = { r = 0.1, g = 0.1, b = 0.1, a = 1 },
-    dark = { r = 0.05, g = 0.05, b = 0.05, a = 1 },
-    main_text = { r = 0.9, g = 0.9, b = 0.9, a = 1 },
-    secondary_text = { r = 0.6, g = 0.6, b = 0.6, a = 1 },
-    highlight = { r = 0.2, g = 0.6, b = 0.8, a = 1 },
-    button = { r = 0.125, g = 0.125, b = 0.125, a = 1 },
-    button_hover = { r = 0.15, g = 0.15, b = 0.15, a = 1 },
-    bright = { r = 0.2, g = 0.2, b = 0.2, a = 1 },
-    button_pressed = { r = 0.3, g = 0.3, b = 0.3, a = 1 },
-    border = { r = 0.2, g = 0.2, b = 0.2, a = 1 },
-    white = { r = 0.9, g = 0.9, b = 0.9, a = 1 },
-    red = { r = 0.8, g = 0.2, b = 0.2, a = 1 },
-    green = { r = 0.2, g = 0.8, b = 0.4, a = 1 },
-    disabled = { r = 0.05, g = 0.05, b = 0.05, a = 1 },
-}
-
 function lerp(a, b, t)
     return a + (b - a) * t
 end
@@ -29,7 +12,8 @@ function clamp(val, lower, upper)
     return math.max(lower, math.min(upper, val))
 end
 
-cur_hover = { 0, 0, 0, 0 }
+local cur_hover = { 0, 0, 0, 0 }
+local cur_hover_circle = { 0, 0, 0 }
 
 function is_hover(x, y, w, h, px, py, ox, oy)
     x = x + ox
@@ -45,10 +29,14 @@ function is_hover(x, y, w, h, px, py, ox, oy)
     return false
 end
 
-function is_mouse_hover(x, y, w, h, ox, oy)
+function is_mouse_hover(x, y, w, h, ox, oy, pox, poy)
     if ox == nil then ox = 0 end
     if oy == nil then oy = 0 end
+    if pox == nil then pox = 0 end
+    if poy == nil then poy = 0 end
     local px, py = love.mouse.getPosition()
+    px = px - pox
+    py = py - poy
     return is_hover(x, y, w, h, px, py, ox, oy)
 end
 
@@ -56,11 +44,26 @@ function is_hover_circle(x, y, radius, px, py, ox, oy)
     x = x + ox
     y = y + oy
     local distance = math.sqrt((px - x) ^ 2 + (py - y) ^ 2)
-    return distance <= radius
+    local da = distance <= radius
+    local new = (cur_hover[1] == 0 and cur_hover_circle[2] == 0 and cur_hover_circle[3] == 0)
+    local inside = not new and
+        ((cur_hover_circle[1] == x and cur_hover_circle[2] == y and cur_hover_circle[3] == radius) or
+            (cur_hover_circle[1] <= x and cur_hover_circle[2] <= y and cur_hover_circle[3] >= radius))
+    if (new or inside) and da then
+        cur_hover_circle = { x, y, radius }
+        return true
+    end
+    return false
 end
 
-function is_mouse_hover_circle(x, y, radius, ox, oy)
+function is_mouse_hover_circle(x, y, radius, ox, oy, pox, poy)
+    if ox == nil then ox = 0 end
+    if oy == nil then oy = 0 end
+    if pox == nil then pox = 0 end
+    if poy == nil then poy = 0 end
     local px, py = love.mouse.getPosition()
+    px = px - pox
+    py = py - poy
     return is_hover_circle(x, y, radius, px, py, ox, oy)
 end
 
@@ -128,4 +131,5 @@ end
 
 function tools_update(dt)
     cur_hover = { 0, 0, 0, 0 }
+    cur_hover_circle = { 0, 0, 0 }
 end

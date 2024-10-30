@@ -4,6 +4,7 @@ require "pages.dashboard"
 require "components.sideBar"
 require "stuff.clickEffect"
 require "stuff.button"
+require "stuff.iconButton"
 
 MainPage = {}
 

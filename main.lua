@@ -1,14 +1,11 @@
+require "lib.loader"
+
 require "assets.shaders"
 require "lib.tools"
 Timer = require "lib.Timer"
 
 require "pages.mainPage"
 require "components.windowTopBar"
-
-WorkSans = love.graphics.newFont("assets/fonts/Work_Sans/static/WorkSans-Regular.ttf", 16)
-WorkSansBig = love.graphics.newFont("assets/fonts/Work_Sans/static/WorkSans-Regular.ttf", 24)
-WorkSansSemiBold = love.graphics.newFont("assets/fonts/Work_Sans/static/WorkSans-SemiBold.ttf", 16)
-WorkSansSemiBoldBig = love.graphics.newFont("assets/fonts/Work_Sans/static/WorkSans-SemiBold.ttf", 24)
 
 offset = { x = 0, y = 0 }
 function set_offset(x, y)

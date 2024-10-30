@@ -1,6 +1,6 @@
 SideBarOption = {}
 
-function SideBarOption:new(side_bar, i, icon_path, label, page)
+function SideBarOption:new(side_bar, i, icon_image, label, page)
     local obj = {}
 
     obj.label = label
@@ -30,7 +30,7 @@ function SideBarOption:new(side_bar, i, icon_path, label, page)
         },
         padding = 12,
         color = { r = colors.main_text.r, g = colors.main_text.g, b = colors.main_text.b, a = 1 },
-        image = love.graphics.newImage(icon_path),
+        image = icon_image,
     }
     function obj:load()
     end
@@ -83,7 +83,7 @@ function SideBarOption:new(side_bar, i, icon_path, label, page)
             obj.icon.coords.h - obj.icon.padding * 2, "horizontal")
 
         love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, colors.main_text.a)
-        love.graphics.printf(obj.label, WorkSans, obj.icon.coords.w + 5,
+        love.graphics.printf(obj.label, fonts.WorkSans, obj.icon.coords.w + 5,
             obj.coords.h * obj.i + obj.coords.y + 10,
             love.graphics.getWidth(),
             "left")

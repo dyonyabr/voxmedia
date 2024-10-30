@@ -25,7 +25,7 @@ function WindowTopBar:new()
         },
         width = 50,
         color = { r = colors.red.r, g = colors.red.g, b = colors.red.b, a = 0 },
-        image = love.graphics.newImage("assets/icons/close.png"),
+        image = icons.close,
         padding = 6,
         hovered = false
     }
@@ -38,7 +38,7 @@ function WindowTopBar:new()
             h = obj.coords.h
         },
         color = { r = colors.button_hover.r, g = colors.button_hover.g, b = colors.button_hover.b, a = 0 },
-        image = love.graphics.newImage("assets/icons/minimize.png"),
+        image = icons.minimize,
         padding = 6,
         hovered = false
     }
@@ -97,7 +97,7 @@ function WindowTopBar:new()
         love.graphics.rectangle("fill", obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h)
 
         love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, colors.main_text.a)
-        love.graphics.printf("VoxMedia", WorkSans, 15, 6, love.graphics.getWidth(), "left")
+        love.graphics.printf("VoxMedia", fonts.WorkSans, 15, 6, love.graphics.getWidth(), "left")
 
         love.graphics.setColor(obj.close.color.r, obj.close.color.g, obj.close.color.b, obj.close.color.a)
         love.graphics.rectangle("fill", obj.close.coords.x, obj.close.coords.y, obj.close.coords.w, obj.close.coords.h)

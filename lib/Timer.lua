@@ -108,8 +108,17 @@ function Timer:every(delay, action, count, after, tag)
         tag = tag or UUID()
     end
     self:cancel(tag)
-    self.timers[tag] = { type = 'every', time = 0, any_delay = delay, delay = self:__getResolvedDelay(delay), action =
-    action, counter = 0, count = count or 0, after = after or function() end }
+    self.timers[tag] = {
+        type = 'every',
+        time = 0,
+        any_delay = delay,
+        delay = self:__getResolvedDelay(delay),
+        action =
+            action,
+        counter = 0,
+        count = count or 0,
+        after = after or function() end
+    }
     return tag
 end
 
@@ -122,8 +131,14 @@ function Timer:during(delay, action, after, tag)
         tag = tag or UUID()
     end
     self:cancel(tag)
-    self.timers[tag] = { type = 'during', time = 0, delay = self:__getResolvedDelay(delay), action = action, after =
-    after or function() end }
+    self.timers[tag] = {
+        type = 'during',
+        time = 0,
+        delay = self:__getResolvedDelay(delay),
+        action = action,
+        after =
+            after or function() end
+    }
     return tag
 end
 
@@ -195,11 +210,11 @@ t.back = function(s, bounciness)
 end
 t.bounce = function(s)
     local a, b = 7.5625, 1 / 2.75; return math.min(a * s ^ 2, a * (s - 1.5 * b) ^ 2 + 0.75, a * (s - 2.25 * b) ^ 2 +
-    0.9375, a * (s - 2.625 * b) ^ 2 + 0.984375)
+        0.9375, a * (s - 2.625 * b) ^ 2 + 0.984375)
 end
 t.elastic = function(s, amp, period)
     amp, period = amp and math.max(1, amp) or 1, period or 0.3; return (-amp * math.sin(2 * math.pi / period * (s - 1) - math.asin(1 / amp))) *
-    2 ^ (10 * (s - 1))
+        2 ^ (10 * (s - 1))
 end
 
 function Timer:__tween(method, ...)
