@@ -37,10 +37,22 @@ function MainPage:new()
         end
     end
 
+    function obj:keypressed(k)
+        if obj.page ~= nil then
+            obj.page:keypressed(k)
+        end
+    end
+
     function obj:mousepressed(x, y, button)
         obj.side_bar:mousepressed(x, y, button)
         if obj.page ~= nil then
             obj.page:mousepressed(x, y, button)
+        end
+    end
+
+    function obj:wheelmoved(x, y)
+        if obj.page ~= nil then
+            obj.page:wheelmoved(x, y)
         end
     end
 

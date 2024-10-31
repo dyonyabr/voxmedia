@@ -14,16 +14,18 @@ end
 
 local cur_hover = { 0, 0, 0, 0 }
 local cur_hover_circle = { 0, 0, 0 }
+local new_hover = true
 
 function is_hover(x, y, w, h, px, py, ox, oy)
     x = x + ox
     y = y + oy
     local da = not (px < x or py < y or px > x + w or py > y + h)
-    local new = (cur_hover[1] == 0 and cur_hover[2] == 0 and cur_hover[3] == 0 and cur_hover[4] == 0)
-    local inside = not new and ((cur_hover[1] == x and cur_hover[2] == y and cur_hover[3] == w and cur_hover[4] == h) or
-        (cur_hover[1] <= x and cur_hover[2] <= y and cur_hover[3] >= w and cur_hover[4] >= h))
-    if (new or inside) and da then
+    local inside = not new_hover and
+        ((cur_hover[1] == x and cur_hover[2] == y and cur_hover[3] == w and cur_hover[4] == h) or
+            (cur_hover[1] <= x and cur_hover[2] <= y and cur_hover[3] >= w and cur_hover[4] >= h))
+    if (new_hover or inside) and da then
         cur_hover = { x, y, w, h }
+        new_hover = false
         return true
     end
     return false
@@ -45,12 +47,12 @@ function is_hover_circle(x, y, radius, px, py, ox, oy)
     y = y + oy
     local distance = math.sqrt((px - x) ^ 2 + (py - y) ^ 2)
     local da = distance <= radius
-    local new = (cur_hover[1] == 0 and cur_hover_circle[2] == 0 and cur_hover_circle[3] == 0)
-    local inside = not new and
+    local inside = not new_hover and
         ((cur_hover_circle[1] == x and cur_hover_circle[2] == y and cur_hover_circle[3] == radius) or
             (cur_hover_circle[1] <= x and cur_hover_circle[2] <= y and cur_hover_circle[3] >= radius))
-    if (new or inside) and da then
+    if (new_hover or inside) and da then
         cur_hover_circle = { x, y, radius }
+        new_hover = false
         return true
     end
     return false
@@ -132,4 +134,5 @@ end
 function tools_update(dt)
     cur_hover = { 0, 0, 0, 0 }
     cur_hover_circle = { 0, 0, 0 }
+    new_hover = true
 end

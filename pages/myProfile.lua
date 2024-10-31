@@ -5,6 +5,11 @@ function MyProfile:new()
     local obj = {}
 
     obj.offset = { x = 40, y = 30 }
+    obj.can_swipe = true
+    obj.swap_timer = Timer()
+
+    obj.tone = 0
+    obj.tone_lerp = 0
 
     obj.avatar = {
         image = images.test_avatar,
@@ -53,12 +58,12 @@ function MyProfile:new()
     }
 
     obj.post_left = IconButton:new(icons.arrow_left, function() obj:set_cur_post(obj.cur_post - 1) end,
-        obj.post_count.x - 20, love.graphics.getHeight() - 65, 20, 10, obj.offset.x,
+        obj.post_count.x - 20, love.graphics.getHeight() - 65, 20, 10, true, obj.offset.x,
         obj.offset.y)
 
     obj.post_right = IconButton:new(icons.arrow_right,
         function() obj:set_cur_post(obj.cur_post + 1) end,
-        obj.post_count.x + obj.post_count.w + 20, love.graphics.getHeight() - 65, 20, 10, obj.offset.x,
+        obj.post_count.x + obj.post_count.w + 20, love.graphics.getHeight() - 65, 20, 10, true, obj.offset.x,
         obj.offset.y)
 
     function obj:load()
@@ -69,41 +74,72 @@ function MyProfile:new()
         obj.post_right:load()
     end
 
+    function obj:keypressed(k)
+        if not obj.posts[obj.cur_post + 1].content.clicked then
+            if k == "left" then
+                obj:set_cur_post(obj.cur_post - 1)
+            elseif k == "right" then
+                obj:set_cur_post(obj.cur_post + 1)
+            end
+        end
+    end
+
     function obj:mousepressed(x, y, button)
         obj.posts[obj.cur_post + 1]:mousepressed(x, y, button)
         obj.post_left:mousepressed(x, y, button)
         obj.post_right:mousepressed(x, y, button)
     end
 
+    function obj:wheelmoved(x, y)
+        -- if is_mouse_hover(0, obj.avatar.y + 100, love.graphics.getWidth() - obj.offset.x, 350) and obj.can_swipe then
+        --     if x == 1 or x == -1 then
+        --         local da = x
+        --         obj:set_cur_post(obj.cur_post + da)
+        --         obj.can_swipe = false
+        --         obj.swap_timer:after(1, function()
+        --             obj.can_swipe = true
+        --         end)
+        --     end
+        -- end
+    end
+
     function obj:update(dt)
-        if is_mouse_hover_circle(obj.avatar.x, obj.avatar.y, obj.avatar.radius, obj.offset.x, obj.offset.y) then
-            set_cursor("hand")
-            obj.avatar.hovered = true
-        else
-            obj.avatar.hovered = false
-        end
+        obj.swap_timer:update(dt)
 
-        obj.post_trans = lerp(obj.post_trans, -700 * obj.cur_post, dt * 10)
-
-        local cap_edit_y = 0
-        if obj.avatar.hovered then cap_edit_y = 40 end
-        obj.avatar.edit_y = lerp(obj.avatar.edit_y, cap_edit_y, dt * 20)
-
-        if is_mouse_hover(obj.cap.x, obj.cap.y, obj.cap.w, obj.cap.h, obj.offset.x, obj.offset.y) and not obj.avatar.hovered then
-            set_cursor("hand")
-            obj.cap.hovered = true
-        else
-            obj.cap.hovered = false
-        end
-
-        local cap_edit_a = 0
-        if obj.cap.hovered then cap_edit_a = 1 end
-        obj.cap.edit_a = lerp(obj.cap.edit_a, cap_edit_a, dt * 20)
-
+        if obj.cur_post ~= 0 then obj.posts[obj.cur_post]:update(dt) end
         obj.posts[obj.cur_post + 1]:update(dt)
+        if obj.cur_post ~= #obj.posts - 1 then obj.posts[obj.cur_post + 2]:update(dt) end
 
-        obj.post_left:update(dt)
-        obj.post_right:update(dt)
+        if not obj.posts[obj.cur_post + 1].content.clicked then
+            if is_mouse_hover_circle(obj.avatar.x, obj.avatar.y, obj.avatar.radius, obj.offset.x, obj.offset.y) then
+                set_cursor("hand")
+                obj.avatar.hovered = true
+            else
+                obj.avatar.hovered = false
+            end
+
+            obj.post_trans = lerp(obj.post_trans, -700 * obj.cur_post, dt * 10)
+
+            local cap_edit_y = 0
+            if obj.avatar.hovered then cap_edit_y = 40 end
+            obj.avatar.edit_y = lerp(obj.avatar.edit_y, cap_edit_y, dt * 20)
+
+            if is_mouse_hover(obj.cap.x, obj.cap.y, obj.cap.w, obj.cap.h, obj.offset.x, obj.offset.y) and not obj.avatar.hovered then
+                set_cursor("hand")
+                obj.cap.hovered = true
+            else
+                obj.cap.hovered = false
+            end
+
+            local cap_edit_a = 0
+            if obj.cap.hovered then cap_edit_a = 1 end
+            obj.cap.edit_a = lerp(obj.cap.edit_a, cap_edit_a, dt * 20)
+
+            obj.post_left:update(dt)
+            obj.post_right:update(dt)
+        end
+
+        obj.tone_lerp = lerp(obj.tone_lerp, obj.posts[obj.cur_post + 1].tone, dt * 10)
     end
 
     function obj:draw()
@@ -148,8 +184,20 @@ function MyProfile:new()
             obj.avatar.x - obj.avatar.radius - 15, "right")
 
         love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
-        love.graphics.printf("Posts", fonts.WorkSansBig, obj.post_offset.x, obj.post_offset.y - 50,
+        love.graphics.printf("Posts", fonts.WorkSansBig, obj.post_offset.x + 15, obj.post_offset.y - 50,
             love.graphics.getWidth(), "left")
+
+        if not obj.posts[obj.cur_post + 1].content.clicked then
+            obj.post_left:draw()
+            obj.post_right:draw()
+            love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
+            love.graphics.printf((obj.cur_post + 1) .. " / " .. #obj.posts, obj.post_count.x, obj.post_count.y,
+                obj.post_count.w, "center")
+        end
+
+
+        love.graphics.setColor(0, 0, 0, obj.tone_lerp)
+        love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 
         love.graphics.push()
 
@@ -161,13 +209,6 @@ function MyProfile:new()
         if obj.cur_post ~= #obj.posts - 1 then obj.posts[obj.cur_post + 2]:draw() end
 
         love.graphics.pop()
-
-        obj.post_left:draw()
-        obj.post_right:draw()
-
-        love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
-        love.graphics.printf((obj.cur_post + 1) .. " / " .. #obj.posts, obj.post_count.x, obj.post_count.y,
-            obj.post_count.w, "center")
     end
 
     setmetatable(obj, self)

@@ -9,6 +9,9 @@ function Dashboard:new()
     function obj:mousepressed(x, y, button)
     end
 
+    function obj:mousepressed(x, y, button)
+    end
+
     function obj:update(dt)
     end
 

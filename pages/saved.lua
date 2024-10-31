@@ -9,6 +9,9 @@ function Saved:new()
     function obj:mousepressed(x, y, button)
     end
 
+    function obj:wheelmoved(x, y, button)
+    end
+
     function obj:update(dt)
     end
 

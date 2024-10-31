@@ -22,12 +22,8 @@ function love.load()
     main_page:load()
 end
 
-function love.update(dt)
-    set_cursor("arrow")
-
-    window_top_bar:update(dt)
-    main_page:update(dt)
-    tools_update(dt)
+function love.keypressed(k)
+    main_page:keypressed(k)
 end
 
 function love.mousepressed(x, y, button)
@@ -35,12 +31,16 @@ function love.mousepressed(x, y, button)
     main_page:mousepressed(x, y, button)
 end
 
-function love.keypressed(k)
-    -- if k == "x" then
-    --     love.window.close()
-    -- elseif k == "c" then
-    --     love.window.minimize()
-    -- end
+function love.wheelmoved(x, y)
+    main_page:wheelmoved(x, y)
+end
+
+function love.update(dt)
+    set_cursor("arrow")
+
+    window_top_bar:update(dt)
+    main_page:update(dt)
+    tools_update(dt)
 end
 
 love.graphics.setBackgroundColor(colors.dark.r, colors.dark.g, colors.dark.b, 1)
