@@ -17,6 +17,19 @@ function PagePost:new(page, i, x, y, pox, poy)
     obj.max_content_w = obj.coords.w - 30
 
     obj.content = {
+        canvas = dream:newCanvases(),
+        camera = dream:newCamera(),
+        model = dream:loadObject("assets/objects/cube"),
+        pos_grabbed = false,
+        rot_grabbed = false,
+        lerp_posx = 0,
+        lerp_posy = 0,
+        lerp_posz = 0,
+        lerp_rotx = math.rad(35),
+        lerp_roty = math.pi / 4,
+        lerp_rotz = 0,
+        lerp_zoom = 6,
+        light = dream:newLight("sun"),
         x = 15,
         y = 15,
         w = obj.min_content_w,
@@ -29,7 +42,6 @@ function PagePost:new(page, i, x, y, pox, poy)
         expanded_y = -165,
         expanded_w = obj.coords.w + 30,
         expanded_h = 500,
-        color = { r = love.math.random(0, 100) / 100, g = love.math.random(0, 100) / 100, b = love.math.random(0, 100) / 100, 1 },
         hovered = false,
         view_icon = icons.expand,
         vi_x = 0,
@@ -43,7 +55,6 @@ function PagePost:new(page, i, x, y, pox, poy)
 
     obj.content.vi_x = obj.coords.x + obj.content.w + obj.content.x - 40
     obj.content.vi_y = obj.coords.y + obj.content.y + 10
-
 
     obj.like = {
         clicked = false,
@@ -75,6 +86,9 @@ function PagePost:new(page, i, x, y, pox, poy)
         obj.like.ib:load()
         obj.comment.ib:load()
         obj.save.ib:load()
+
+        obj.content.camera:setFov(54)
+        obj.content.camera:translate(0, 0, 10)
     end
 
     function obj:update(dt)
@@ -112,18 +126,43 @@ function PagePost:new(page, i, x, y, pox, poy)
                 set_cursor("hand")
             end
         else
+            obj.content.posx, obj.content.posy, obj.content.posz = 0, 0, 0
+            obj.content.rotx, obj.content.roty, obj.content.rotz = math.rad(35), math.pi / 4, 0
+            obj.content.zoom = 6
             obj.like.ib:update(dt)
             obj.comment.ib:update(dt)
             obj.save.ib:update(dt)
             obj.content.view_icon = icons.expand
         end
         if obj.content.hovered or obj.content.clicked then content_a = .5 + (obj.content.vi_hovered and 1 or 0) * .5 end
+        if obj.content.hovered and not obj.content.clicked then
+            obj.content.zoom = obj.content.zoom - 1
+        end
+
+        if obj.content.rot_grabbed then set_cursor("sizeall") end
 
         obj.content.hover_a = lerp(obj.content.hover_a, content_a, dt * 10)
         obj.content.x = lerp(obj.content.x, content_x, dt * 10)
         obj.content.y = lerp(obj.content.y, content_y, dt * 10)
         obj.content.w = lerp(obj.content.w, content_w, dt * 10)
         obj.content.h = lerp(obj.content.h, content_h, dt * 10)
+        obj.content.lerp_posx = lerp(obj.content.lerp_posx, obj.content.posx, dt * 10)
+        obj.content.lerp_posy = lerp(obj.content.lerp_posy, obj.content.posy, dt * 10)
+        obj.content.lerp_posz = lerp(obj.content.lerp_posz, obj.content.posz, dt * 10)
+        obj.content.lerp_rotx = lerp_angle(obj.content.lerp_rotx, obj.content.rotx, dt * 10)
+        obj.content.lerp_roty = lerp_angle(obj.content.lerp_roty, obj.content.roty, dt * 10)
+        obj.content.lerp_rotz = lerp_angle(obj.content.lerp_rotz, obj.content.rotz, dt * 10)
+        obj.content.lerp_zoom = lerp(obj.content.lerp_zoom, obj.content.zoom, dt * 10)
+
+        obj.content.camera:resetTransform()
+        obj.content.camera:setTransform(dream:lookAt(dream.vec3(obj.content.lerp_posx, obj.content.lerp_posy,
+            obj.content.lerp_zoom), dream.vec3(0, 0, 0)):invert())
+        obj.content.camera:setSize(obj.content.lerp_zoom)
+
+        obj.content.model:resetTransform()
+        obj.content.model:rotateX(obj.content.lerp_rotx)
+        obj.content.model:rotateY(obj.content.lerp_roty)
+        obj.content.model:rotateZ(obj.content.lerp_rotz)
     end
 
     function obj:mousepressed(x, y, button)
@@ -137,12 +176,32 @@ function PagePost:new(page, i, x, y, pox, poy)
         if obj.content.vi_hovered then
             obj.content.clicked = false
         end
+
+        if obj.content.clicked and button == 1 and not obj.content.pos_grabbed then
+            obj.content.rot_grabbed = true
+        end
+    end
+
+    function obj:wheelmoved(x, y)
+        if obj.content.clicked then
+            obj.content.zoom = obj.content.zoom - y * .5
+        end
+    end
+
+    function obj:mousereleased(x, y, button)
+        if button == 1 then
+            obj.content.rot_grabbed = false
+        end
+    end
+
+    function obj:mousemoved(x, y, dx, dy)
+        if obj.content.rot_grabbed then
+            obj.content.roty = obj.content.roty - dx * .005
+            obj.content.rotx = obj.content.rotx + dy * .005
+        end
     end
 
     function obj:draw()
-        -- love.graphics.setColor(colors.main.r, colors.main.g, colors.main.b, 1)
-        -- box_shadow(obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h, 40, { 0, 0, 0, .2 })
-
         local like_color = nil
         if obj.like.clicked then like_color = { r = colors.red.r, g = colors.red.g, b = colors.red.b, 1 } end
         obj.like.ib:draw(700 * i, 0, like_color)
@@ -193,9 +252,19 @@ function PagePost:new(page, i, x, y, pox, poy)
         end, "replace", 1)
         love.graphics.setStencilTest("greater", 0)
 
-        love.graphics.setColor(obj.content.color.r, obj.content.color.g, obj.content.color.b, 1)
-        love.graphics.rectangle("fill", obj.coords.x + obj.content.x, obj.coords.y + obj.content.y, obj.content.w,
-            obj.content.h)
+        love.graphics.push()
+        love.graphics.translate(obj.coords.x + obj.content.x - 10, obj.coords.y + obj.content.y - 10)
+        obj.content.canvas:init(obj.content.w + 20, obj.content.h + 20)
+
+        dream:prepare()
+
+        dream:addLight(obj.content.light)
+
+        dream:draw(obj.content.model)
+
+        dream:present(obj.content.camera, obj.content.canvas)
+
+        love.graphics.pop()
 
         love.graphics.setColor(0, 0, 0, obj.content.hover_a * 0)
         love.graphics.rectangle("fill", obj.coords.x + obj.content.x, obj.coords.y + obj.content.y, obj.content.w,

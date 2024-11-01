@@ -1,3 +1,11 @@
+dream = require "3DreamEngine"
+require "assets.shaders"
+require "lib.tools"
+Timer = require "lib.Timer"
+
+require "pages.mainPage"
+require "components.windowTopBar"
+
 colors = {
     main = { r = 0.1, g = 0.1, b = 0.1, a = 1 },
     dark = { r = 0.05, g = 0.05, b = 0.05, a = 1 },

@@ -43,6 +43,12 @@ function MainPage:new()
         end
     end
 
+    function obj:wheelmoved(x, y)
+        if obj.page ~= nil then
+            obj.page:wheelmoved(x, y)
+        end
+    end
+
     function obj:mousepressed(x, y, button)
         obj.side_bar:mousepressed(x, y, button)
         if obj.page ~= nil then
@@ -50,9 +56,15 @@ function MainPage:new()
         end
     end
 
-    function obj:wheelmoved(x, y)
+    function obj:mousereleased(x, y, button)
         if obj.page ~= nil then
-            obj.page:wheelmoved(x, y)
+            obj.page:mousereleased(x, y, button)
+        end
+    end
+
+    function obj:mousemoved(x, y, dx, dy)
+        if obj.page ~= nil then
+            obj.page:mousemoved(x, y, dx, dy)
         end
     end
 

@@ -2,6 +2,11 @@ function lerp(a, b, t)
     return a + (b - a) * t
 end
 
+function lerp_angle(a, b, t)
+    local diff = (b - a + math.pi) % (2 * math.pi) - math.pi
+    return a + diff * t
+end
+
 function posmod(a, b)
     return ((a % b) + b) % b
 end

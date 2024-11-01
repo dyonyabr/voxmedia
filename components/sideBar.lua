@@ -40,7 +40,15 @@ function SideBar:new(main_page)
     end
 
     function obj:update(dt)
-        if is_mouse_hover(obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h, obj.offset.x, obj.offset.y) then
+        local da = true
+        if main_page.page == nil or main_page.page.posts == nil then
+            da = true
+        else
+            if main_page.page.posts[main_page.page.cur_post + 1].content.clicked then
+                da = false
+            end
+        end
+        if is_mouse_hover(obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h, obj.offset.x, obj.offset.y) and da then
             obj.hovered = true
         else
             obj.hovered = false
