@@ -207,9 +207,10 @@ function MyProfile:new()
         set_offset(obj.post_trans, 0)
         -- love.graphics.translate(obj.post_trans, 0)
 
-        if obj.cur_post ~= 0 then obj.posts[obj.cur_post]:draw() end
+        if obj.cur_post ~= 0 and not obj.posts[obj.cur_post + 1].content.clicked then obj.posts[obj.cur_post]:draw() end
         obj.posts[obj.cur_post + 1]:draw()
-        if obj.cur_post ~= #obj.posts - 1 then obj.posts[obj.cur_post + 2]:draw() end
+        if obj.cur_post ~= #obj.posts - 1 and not obj.posts[obj.cur_post + 1].content.clicked then obj.posts
+                [obj.cur_post + 2]:draw() end
 
         love.graphics.pop()
     end

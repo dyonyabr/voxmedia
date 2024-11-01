@@ -1,3 +1,4 @@
+require "shared"
 dream = require "3DreamEngine"
 require "assets.shaders"
 require "lib.tools"

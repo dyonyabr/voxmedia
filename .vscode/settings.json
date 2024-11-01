@@ -1,17 +1,13 @@
 {
-    "Lua.diagnostics.globals": [
-        "love"
-    ],
-    "Lua.diagnostics.disable": [
-        "lowercase-global",
-    ],
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/Thumbs.db": true,
-        "**/3DreamEngine": true,
-    },
+  "Lua.diagnostics.globals": ["love"],
+  "Lua.diagnostics.disable": ["lowercase-global", "duplicate-set-field"],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/3DreamEngine": true
+  }
 }
