@@ -1,0 +1,12 @@
+{
+  "Lua.diagnostics.disable": ["lowercase-global", "duplicate-set-field"],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  },
+  "Lua.diagnostics.globals": ["love"]
+}
