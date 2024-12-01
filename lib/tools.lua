@@ -2,6 +2,9 @@ function lerp(a, b, t)
   return a + (b - a) * t
 end
 
+months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+  "November", "December" }
+
 function lerp_angle(a, b, t)
   local diff = (b - a + math.pi) % (2 * math.pi) - math.pi
   return a + diff * t
@@ -124,12 +127,11 @@ function box_text(text, x, y, w, h, font, align)
   -- Set the font
   love.graphics.setFont(font)
 
-  -- Calculate how many lines of text can fit in the height
-  local lineHeight = font:getHeight()
-  local maxLines = math.floor(h / lineHeight)
+  width, wrappedtext = font:getWrap(text, w)
 
-  -- Create a formatted text object that wraps to the specified width
   love.graphics.printf(text, x, y, w, align)
+
+  return font:getHeight() * #wrappedtext
 end
 
 function set_cursor(type)
@@ -189,7 +191,7 @@ function rgb2hsv(r, g, b)
   -- Calculate hue
   local h
   if delta == 0 then
-    h = 0     -- undefined
+    h = 0 -- undefined
   elseif max == r then
     h = (g - b) / delta % 6
   elseif max == g then
@@ -198,7 +200,7 @@ function rgb2hsv(r, g, b)
     h = (r - g) / delta + 4
   end
 
-  h = h / 6   -- normalize hue to be between 0 and 1
+  h = h / 6 -- normalize hue to be between 0 and 1
 
   -- Return HSV values
   return h, s, v

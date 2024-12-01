@@ -58,14 +58,26 @@ function MyProfile:new()
   }
 
   obj.posts = {}
-  for i = 0, 9 do
-    obj.posts[i + 1] = PagePost:new(obj, i, obj.post_offset.x, obj.post_offset.y,
-      obj.offset.x,
-      obj.offset.y)
+  local user = client:get_user(1)
+  local cl_posts
+  if user then
+    cl_posts = user.posts
+    for i = 0, #cl_posts - 1 do
+      obj.posts[i + 1] = PagePost:new(
+        cl_posts[i + 1].description,
+        cl_posts[i + 1].likes,
+        cl_posts[i + 1].comments,
+        obj, i, obj.post_offset.x, obj.post_offset.y,
+        obj.offset.x,
+        obj.offset.y)
+    end
   end
 
   obj.cur_post = 0
-  function obj:set_cur_post(value) obj.cur_post = clamp(value, 0, #obj.posts - 1) end
+  function obj:set_cur_post(value)
+    obj.cur_post =
+        clamp(value, 0, #obj.posts - 1)
+  end
 
   obj.post_trans = 0
 
@@ -94,17 +106,19 @@ function MyProfile:new()
   end
 
   function obj:keypressed(k)
-    if not obj.posts[obj.cur_post + 1].content.clicked then
-      if k == "left" then
-        obj:set_cur_post(obj.cur_post - 1)
-      elseif k == "right" then
-        obj:set_cur_post(obj.cur_post + 1)
-      end
-    end
+    -- if not obj.posts[obj.cur_post + 1].content.clicked then
+    --   if k == "left" then
+    --     obj:set_cur_post(obj.cur_post - 1)
+    --   elseif k == "right" then
+    --     obj:set_cur_post(obj.cur_post + 1)
+    --   end
+    -- end
   end
 
   function obj:mousepressed(x, y, button)
-    obj.posts[obj.cur_post + 1]:mousepressed(x, y, button)
+    if #obj.posts > 0 then
+      obj.posts[obj.cur_post + 1]:mousepressed(x, y, button)
+    end
     obj.post_left:mousepressed(x, y, button)
     obj.post_right:mousepressed(x, y, button)
     if obj.new_post.hovered and button == 1 then
@@ -114,30 +128,38 @@ function MyProfile:new()
   end
 
   function obj:wheelmoved(x, y)
-    obj.posts[obj.cur_post + 1]:wheelmoved(x, y)
+    if #obj.posts > 0 then
+      obj.posts[obj.cur_post + 1]:wheelmoved(x, y)
+    end
   end
 
   function obj:mousereleased(x, y, button)
-    obj.posts[obj.cur_post + 1]:mousereleased(x, y, button)
+    if #obj.posts > 0 then
+      obj.posts[obj.cur_post + 1]:mousereleased(x, y, button)
+    end
   end
 
   function obj:mousemoved(x, y, dx, dy)
-    obj.posts[obj.cur_post + 1]:mousemoved(x, y, dx, dy)
+    if #obj.posts > 0 then
+      obj.posts[obj.cur_post + 1]:mousemoved(x, y, dx, dy)
+    end
   end
 
   function obj:update(dt)
     obj.swap_timer:update(dt)
 
     if obj.cur_post ~= 0 then obj.posts[obj.cur_post]:update(dt) end
-    obj.posts[obj.cur_post + 1]:update(dt)
-    if obj.cur_post ~= #obj.posts - 1 then obj.posts[obj.cur_post + 2]:update(dt) end
+    if #obj.posts > 0 then
+      obj.posts[obj.cur_post + 1]:update(dt)
+      if obj.cur_post ~= #obj.posts - 1 then obj.posts[obj.cur_post + 2]:update(dt) end
 
-    if not obj.posts[obj.cur_post + 1].content.clicked then
-      if is_mouse_hover_circle(obj.avatar.x, obj.avatar.y, obj.avatar.radius, obj.offset.x, obj.offset.y) then
-        set_cursor("hand")
-        obj.avatar.hovered = true
-      else
-        obj.avatar.hovered = false
+      if not obj.posts[obj.cur_post + 1].content.clicked and not obj.posts[obj.cur_post + 1].comments_field.opened then
+        if is_mouse_hover_circle(obj.avatar.x, obj.avatar.y, obj.avatar.radius, obj.offset.x, obj.offset.y) then
+          set_cursor("hand")
+          obj.avatar.hovered = true
+        else
+          obj.avatar.hovered = false
+        end
       end
 
       local npr, npg, npb, w = obj.new_post.base_color.r, obj.new_post.base_color.g, obj.new_post.base_color.b, 40
@@ -186,7 +208,11 @@ function MyProfile:new()
     end
 
     obj.post_trans = lerp(obj.post_trans, -700 * obj.cur_post, dt * 10)
-    obj.tone_lerp = lerp(obj.tone_lerp, obj.posts[obj.cur_post + 1].tone, dt * 10)
+    if #obj.posts > 0 then
+      obj.tone_lerp = lerp(obj.tone_lerp, obj.posts[obj.cur_post + 1].tone, dt * 10)
+    else
+      obj.tone_lerp = lerp(obj.tone_lerp, 0, dt * 10)
+    end
   end
 
   function obj:draw()
@@ -262,7 +288,7 @@ function MyProfile:new()
     love.graphics.printf("Posts", fonts.WorkSansBig, obj.post_offset.x + 15, obj.post_offset.y - 50,
       love.graphics.getWidth(), "left")
 
-    if not obj.posts[obj.cur_post + 1].content.clicked then
+    if #obj.posts > 0 and not obj.posts[obj.cur_post + 1].content.clicked then
       if obj.cur_post ~= 0 then
         obj.post_left:draw()
       end
@@ -270,7 +296,7 @@ function MyProfile:new()
         obj.post_right:draw()
       end
       love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
-      love.graphics.printf((obj.cur_post + 1) .. " / " .. #obj.posts, obj.post_count.x, obj.post_count.y,
+      love.graphics.printf((obj.cur_post + 1) .. " / " .. #obj.posts, fonts.WorkSans, obj.post_count.x, obj.post_count.y,
         obj.post_count.w, "center")
     end
 
@@ -282,13 +308,20 @@ function MyProfile:new()
 
     set_offset(obj.post_trans, 0)
     if obj.cur_post ~= 0 and not obj.posts[obj.cur_post + 1].content.clicked then obj.posts[obj.cur_post]:draw() end
-    obj.posts[obj.cur_post + 1]:draw()
-    if obj.cur_post ~= #obj.posts - 1 and not obj.posts[obj.cur_post + 1].content.clicked then
-      obj.posts
-          [obj.cur_post + 2]:draw()
+    if #obj.posts > 0 then
+      obj.posts[obj.cur_post + 1]:draw()
+      if obj.cur_post ~= #obj.posts - 1 and not obj.posts[obj.cur_post + 1].content.clicked then
+        obj.posts[obj.cur_post + 2]:draw()
+      end
     end
 
     love.graphics.pop()
+
+    if #obj.posts == 0 then
+      love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, 1)
+      love.graphics.printf("There are no posts yet.", fonts.WorkSans, offset.x, offset.y + 300,
+        love.graphics.getWidth() - offset.x, "center")
+    end
   end
 
   setmetatable(obj, self)

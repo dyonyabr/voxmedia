@@ -4,6 +4,8 @@ require "assets.shaders"
 require "lib.tools"
 Timer = require "lib.Timer"
 
+require "client.client"
+
 require "pages.mainPage"
 require "components.windowTopBar"
 
