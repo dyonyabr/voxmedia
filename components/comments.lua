@@ -97,33 +97,40 @@ function Comments:new(entities)
     love.graphics.setFont(fonts.WorkSansBig)
     love.graphics.print("Comments", obj.cur_x + 20, obj.cur_y + 20)
 
-    local iy = 0
-    for i, com in ipairs(obj.entities) do
-      local x, y = obj.cur_x + 80, obj.cur_y + 80 + iy
-
-      love.graphics.stencil(function()
-        love.graphics.circle("fill", x - 40, y + 20, 20)
-      end, "replace", 2, true)
-      love.graphics.setStencilTest("greater", 1)
-
-      love.graphics.setColor(1, 1, 1, obj.alpha ^ 5)
-      drawLTWH(avatar, x - 60, y, 40, 40, "horizontal")
-
-      love.graphics.setStencilTest("greater", 0)
-
-      love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, obj.alpha)
-      local user_name_text_width = love.graphics.newText(fonts.WorkSansSemiBold, com.user_name):getWidth()
-      love.graphics.printf(com.user_name, fonts.WorkSansSemiBold, x, y, obj.w - x + obj.cur_x,
-        "left")
-
+    if #obj.entities == 0 then
       love.graphics.setColor(colors.secondary_text.r, colors.secondary_text.g, colors.secondary_text.b, obj.alpha)
-      local height = box_text(com.content, x, y + 30, obj.w - 160, 80 - y,
-        fonts.WorkSans, "left")
-      iy = iy + height + 70
-      love.graphics.printf(format_time(com.upload_date, com.upload_time), fonts.WorkSans, x,
-        y + height + 40,
-        obj.w - x + obj.cur_x,
-        "left", 0, .75, .75)
+      love.graphics.printf("There are no comments yet.", fonts.WorkSans, obj.cur_x, obj.cur_y + obj.cur_h / 2 - 10,
+        obj.cur_w,
+        "center")
+    else
+      local iy = 0
+      for i, com in ipairs(obj.entities) do
+        local x, y = obj.cur_x + 80, obj.cur_y + 80 + iy
+
+        love.graphics.stencil(function()
+          love.graphics.circle("fill", x - 40, y + 20, 20)
+        end, "replace", 2, true)
+        love.graphics.setStencilTest("greater", 1)
+
+        love.graphics.setColor(1, 1, 1, obj.alpha ^ 5)
+        drawLTWH(avatar, x - 60, y, 40, 40, "horizontal")
+
+        love.graphics.setStencilTest("greater", 0)
+
+        love.graphics.setColor(colors.main_text.r, colors.main_text.g, colors.main_text.b, obj.alpha)
+        local user_name_text_width = love.graphics.newText(fonts.WorkSansSemiBold, com.user_name):getWidth()
+        love.graphics.printf(com.user_name, fonts.WorkSansSemiBold, x, y, obj.w - x + obj.cur_x,
+          "left")
+
+        love.graphics.setColor(colors.secondary_text.r, colors.secondary_text.g, colors.secondary_text.b, obj.alpha)
+        local height = box_text(com.content, x, y + 30, obj.w - 160, 80 - y,
+          fonts.WorkSans, "left")
+        iy = iy + height + 70
+        love.graphics.printf(format_time(com.upload_date, com.upload_time), fonts.WorkSans, x,
+          y + height + 40,
+          obj.w - x + obj.cur_x,
+          "left", 0, .75, .75)
+      end
     end
     love.graphics.setStencilTest()
 

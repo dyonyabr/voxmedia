@@ -58,7 +58,7 @@ function MyProfile:new()
   }
 
   obj.posts = {}
-  local user = client:get_user(1)
+  local user = client:get_user(cur_user_id)
   local cl_posts
   if user then
     cl_posts = user.posts

@@ -51,7 +51,9 @@ function Button:new(text, click_func, x, y, w, h, r, ox, oy, draw_shadow)
 
   function obj:draw()
     if draw_shadow then
-      box_shadow(obj.coords.x, obj.coords.y, obj.coords.w, obj.coords.h, 20, { 0, 0, 0, .15 })
+      box_shadow(obj.coords.x + obj.coords.h / 2, obj.coords.y + obj.coords.h / 2, obj.coords.w - obj.coords.h, 0,
+        20 + obj.coords.h / 2,
+        { 0, 0, 0, .5 })
     end
 
     love.graphics.stencil(function()

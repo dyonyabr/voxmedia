@@ -7,7 +7,10 @@ Timer = require "lib.Timer"
 require "client.client"
 
 require "pages.mainPage"
+require "pages.sign"
 require "components.windowTopBar"
+
+utf8 = require "utf8"
 
 colors = {
   main = { r = 0.1, g = 0.1, b = 0.1, a = 1 },

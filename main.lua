@@ -1,5 +1,26 @@
 require "lib.loader"
 
+cur_user_id = -1
+
+local is_signed = false
+local main_page = {}
+
+function set_signed(id)
+  cur_user_id = id
+  is_signed = true
+  main_page = MainPage:new()
+  main_page:load()
+end
+
+function check_signed()
+  if is_signed then
+    main_page = MainPage:new()
+  else
+    main_page = Sign:new()
+  end
+  main_page:load()
+end
+
 offset = { x = 0, y = 0 }
 function set_offset(x, y)
   offset = { x = x, y = y }
@@ -12,13 +33,18 @@ function open_editor()
   io.popen("start love editor3d")
 end
 
-local main_page = MainPage:new()
 local window_top_bar = WindowTopBar:new()
 
 function love.load(arg, morearg)
   shared_load()
+  check_signed()
   window_top_bar:load()
-  main_page:load()
+end
+
+function love.textinput(t)
+  if not editor_opened then
+    main_page:textinput(t)
+  end
 end
 
 function love.keypressed(k)

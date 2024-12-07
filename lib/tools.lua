@@ -101,25 +101,29 @@ function drawLTWH(image, x, y, width, height, aspect)
   love.graphics.draw(image, x + offsetX, y + offsetY, 0, scaleX, scaleY)
 end
 
-function box_shadow(x, y, w, h, shadowSpread, shadowColor)
+function box_shadow(x, y, w, h, shadowSpread, shadowColor, ox, oy)
+  if not ox then ox = 0 end
+  if not oy then oy = 0 end
   box_shadow_shader:send("rectPos", { x + offset.x, y + offset.y })
   box_shadow_shader:send("rectSize", { w, h })
   box_shadow_shader:send("shadowSpread", shadowSpread)
   box_shadow_shader:send("shadowColor", shadowColor)
 
   love.graphics.setShader(box_shadow_shader)
-  love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+  love.graphics.rectangle("fill", -ox, -oy, love.graphics.getWidth(), love.graphics.getHeight())
   love.graphics.setShader()
 end
 
-function circle_shadow(x, y, radius, shadowSpread, shadowColor)
+function circle_shadow(x, y, radius, shadowSpread, shadowColor, ox, oy)
+  if not ox then ox = 0 end
+  if not oy then oy = 0 end
   circle_shadow_shader:send("circleCenter", { x + offset.x, y + offset.y })
   circle_shadow_shader:send("radius", radius)
   circle_shadow_shader:send("shadowSpread", shadowSpread)
   circle_shadow_shader:send("shadowColor", shadowColor)
 
   love.graphics.setShader(circle_shadow_shader)
-  love.graphics.circle("fill", x, y, radius + shadowSpread)
+  love.graphics.circle("fill", x + ox, y + oy, radius + shadowSpread)
   love.graphics.setShader()
 end
 

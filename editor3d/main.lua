@@ -108,8 +108,8 @@ make_cube(ccv)
 local cursor_cube = g3d.newModel(ccv, "assets/textures/cur_tr.png")
 local cursor_pos = { cam_target[1], cam_target[2], cam_target[3] }
 local cursor = cursor_cube
-ci_verts = {{}}
-cursor_inside = g3d.newModel(ci_verts) 
+ci_verts = { {} }
+cursor_inside = g3d.newModel(ci_verts)
 
 g3d.camera.fov = math.pi / 4
 

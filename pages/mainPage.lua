@@ -37,6 +37,9 @@ function MainPage:new()
     end
   end
 
+  function obj:textinput(t)
+  end
+
   function obj:keypressed(k)
     if obj.page ~= nil then
       obj.page:keypressed(k)
